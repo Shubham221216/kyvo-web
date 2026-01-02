@@ -11,8 +11,32 @@ import { useRecommendMutation } from '../../store/api/api'// adjust path if need
 
 
 
+
 const LandingPage = () => {
   const [recommend, { data, isLoading, error }] = useRecommendMutation()
+
+  const LOCAL_SUGGESTIONS =[
+     '7200-B-XL-JP',
+  '7201-B-XL-JP',
+  '7202-B-XL-JP',
+  'Angular contact ball bearing',
+  'Angular contact bearing 40° contact angle',
+  'High speed bearing for spindle',
+  'Bearing with 10mm bore',
+  'Bearing with 12mm bore',
+  'Bearing with 15mm bore',
+  'Bearing with 30mm outer diameter',
+  'Bearing with 32mm outer diameter',
+  'Bearing with 35mm outer diameter',
+  'SKF angular contact bearing',
+  'Schaeffler angular contact bearing',
+  'NSK angular contact bearing',
+  'FAG angular contact bearing',
+  'High limiting speed grease bearing',
+  'Compare dynamic load ratings',
+  'Bearing for low friction application',
+  'Bearing for compact assemblies',
+  ]
 
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
@@ -23,39 +47,46 @@ const LandingPage = () => {
   // Dev-only fallback so the landing page isn’t empty when /api/suggestions isn’t wired yet.
   const allowMockFallback = import.meta.env.DEV && import.meta.env.VITE_ALLOW_MOCK_FALLBACK !== 'false'
 
+  // useEffect(() => {
+  //   // Basic unmount guard for async fetch.
+  //   let cancelled = false
+
+  //   const load = async () => {
+  //     setLoadingSuggestions(true)
+  //     setSuggestionsError(null)
+  //     try {
+  //       const res = await fetch('/api/suggestions')
+  //       if (!res.ok) throw new Error('Failed to load suggestions')
+  //       const json = await res.json()
+  //       const items = Array.isArray(json?.items) ? json.items : []
+  //       if (!cancelled) setSuggestionsData(items)
+  //     } catch {
+  //       if (cancelled) return
+  //       if (allowMockFallback) {
+  //         // setSuggestionsData(suggestionChips)
+  //         setSuggestionsData(LOCAL_SUGGESTIONS)
+  //         return
+  //       }
+
+  //       // In prod we’d rather show the error than silently hide backend issues.
+  //       setSuggestionsError('Failed to loajyfjfd suggestions.')
+  //       setSuggestionsData([])
+  //     } finally {
+  //       if (!cancelled) setLoadingSuggestions(false)
+  //     }
+  //   }
+
+  //   load()
+  //   return () => {
+  //     cancelled = true
+  //   }
+  // }, [])
   useEffect(() => {
-    // Basic unmount guard for async fetch.
-    let cancelled = false
+  // ✅ Use local suggestions directly (no API call)
+  setSuggestionsData(LOCAL_SUGGESTIONS)
+  setLoadingSuggestions(false)
+}, [])
 
-    const load = async () => {
-      setLoadingSuggestions(true)
-      setSuggestionsError(null)
-      try {
-        const res = await fetch('/api/suggestions')
-        if (!res.ok) throw new Error('Failed to load suggestions')
-        const json = await res.json()
-        const items = Array.isArray(json?.items) ? json.items : []
-        if (!cancelled) setSuggestionsData(items)
-      } catch {
-        if (cancelled) return
-        if (allowMockFallback) {
-          setSuggestionsData(suggestionChips)
-          return
-        }
-
-        // In prod we’d rather show the error than silently hide backend issues.
-        setSuggestionsError('Failed to load suggestions.')
-        setSuggestionsData([])
-      } finally {
-        if (!cancelled) setLoadingSuggestions(false)
-      }
-    }
-
-    load()
-    return () => {
-      cancelled = true
-    }
-  }, [])
 
   const suggestions = useMemo(() => suggestionsData, [suggestionsData])
 

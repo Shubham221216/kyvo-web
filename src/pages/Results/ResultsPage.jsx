@@ -9,7 +9,7 @@ import ResultsTable from '../../components/results/ResultsTable'
 import { PublicLayout } from '../../components/layout'
 import Footer from '../../components/layout/Footer'
 import Data from '../../mocks/Data'
-// import { applyFilters, computeFacets, searchAndRank } from '../../utils/componentSearch'
+import { applyFilters, computeFacets, searchAndRank } from '../../utils/componentSearch'
 import { useRecommendMutation } from '../../store/api/api'
 
 
@@ -116,14 +116,31 @@ const ResultsPage = () => {
       })),
     [data]
   )
+  const filteredResults = useMemo(() => {
+    return applyFilters(backendResults, filters)
+  }, [backendResults, filters])
+
+  const facets = useMemo(() => {
+    return computeFacets(filteredResults)
+  }, [filteredResults])
 
 
+
+
+  // const displayedResults = useMemo(
+  //   () => backendResults.slice(0, Math.min(loadedCount, backendResults.length)),
+  //   [backendResults, loadedCount]
+  // )
   const displayedResults = useMemo(
-    () => backendResults.slice(0, Math.min(loadedCount, backendResults.length)),
-    [backendResults, loadedCount]
+    () =>
+      filteredResults.slice(
+        0,
+        Math.min(loadedCount, filteredResults.length)
+      ),
+    [filteredResults, loadedCount]
   )
 
-  const totalResultsCount = backendResults.length
+  const totalResultsCount = filteredResults.length
 
   useEffect(() => {
     loadedCountRef.current = loadedCount
@@ -241,13 +258,14 @@ const ResultsPage = () => {
       <main className="relative z-10 h-[calc(100vh-80px)] w-full box-border overflow-hidden px-6 py-6">
         <div className="grid h-full min-h-0 grid-cols-1 gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
           <div className="hidden h-full min-h-0 lg:block">
-            {/* <FiltersPanel
+            <FiltersPanel
               facets={facets}
               filters={filters}
               onChangeFilters={setFilters}
               canClear={canClearFilters}
-              loading={loadingComponents && (componentsData?.length ?? 0) === 0}
-            /> */}
+              // loading={loadingComponents && (componentsData?.length ?? 0) === 0}
+              loading={isLoading}
+            />
           </div>
 
           <div className="flex h-full min-h-0 min-w-0 flex-col">
@@ -313,14 +331,15 @@ const ResultsPage = () => {
               </div>
             </div>
             <div className="h-[calc(100%-52px)] min-h-0 box-border overflow-hidden px-4 pb-6">
-              {/* <FiltersPanel
+              <FiltersPanel
                 facets={facets}
                 filters={filters}
                 onChangeFilters={setFilters}
                 canClear={canClearFilters}
-                loading={loadingComponents && (componentsData?.length ?? 0) === 0}
+                // loading={loadingComponents && (componentsData?.length ?? 0) === 0}
+                loading={isLoading}
                 showHeader={false}
-              /> */}
+              />
             </div>
           </div>
         </div>
